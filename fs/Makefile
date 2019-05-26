@@ -32,7 +32,7 @@ USERAPPS :=  $(user_dir)/num.b  \
 		 $(user_dir)/testptelibrary.b
 
 
-FSIMGFILES := motd newmotd $(user_dir)/testarg.b $(user_dir)/init.b $(USERAPPS)
+FSIMGFILES := motd newmotd $(user_dir)/testarg.b $(user_dir)/init.b $(user_dir)/script $(user_dir)/output $(user_dir)/script1 $(USERAPPS)
 
 CFLAGS += -nostdlib -static
 

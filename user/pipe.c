@@ -179,7 +179,11 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 		p->p_buf[p->p_wpos % BY2PIPE] = wbuf[i];
 		p->p_wpos++;
 		while (i < n - 1 && p->p_wpos - p->p_rpos >= BY2PIPE) {
-			syscall_yield();
+			if (_pipeisclosed(fd, p)) {
+				return 0;
+			} else {
+				syscall_yield();
+			}
 		}
 	}
 	return i;

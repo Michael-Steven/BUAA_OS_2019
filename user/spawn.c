@@ -97,15 +97,15 @@ int usr_is_elf_format(u_char *binary){
 
     return 0;
 }
-
+/*
 int 
 usr_load_elf(int fd , Elf32_Phdr *ph, int child_envid){
 	//Hint: maybe this function is useful 
 	//      If you want to use this func, you should fill it ,it's not hard
 	return 0;
 }
-
-int load_prog(u_char *binary, u_int child_envid, int fd)
+*/
+int usr_load_elf(u_char *binary, u_int child_envid, int fd)
 {
         Elf32_Ehdr *ehdr = (Elf32_Ehdr *)binary;
         Elf32_Phdr *phdr = NULL;
@@ -117,6 +117,8 @@ int load_prog(u_char *binary, u_int child_envid, int fd)
         Elf32_Half ph_entry_size;
         int i, r, text_start;
         u_int *blk;
+		//u_int *tmp;
+		//tmp = UTOP - 2 * BY2PG;
         // check whether `binary` is a ELF file.
         if (!usr_is_elf_format(binary)) {
             writef("Target not in ELF Format!\n");
@@ -147,6 +149,15 @@ int load_prog(u_char *binary, u_int child_envid, int fd)
                                 ((char *)blk)[r++] = 0;
                             }
                         }
+						/*if (syscall_mem_alloc(0, tmp, PTE_V | PTE_R) != 0) {
+							user_panic("sys_mem_alloc error!\n");
+						}
+						//copy the content
+						user_bcopy((void *)&blk, (void *)tmp, BY2PG);
+						//map the page on the appropriate place
+						if (syscall_mem_map(0, tmp, child_envid, UTEXT + text_start, PTE_V | PTE_R) != 0) {
+							user_panic("sys_mem_map error!\n");
+						}*/
                         syscall_mem_map(0, blk, child_envid, UTEXT + text_start, PTE_V | PTE_R);
                         text_start += BY2PG;
                     }
@@ -164,6 +175,8 @@ int load_prog(u_char *binary, u_int child_envid, int fd)
         return 0;
 }
 
+
+extern void __asm_pgfault_handler(void);
 
 int spawn(char *prog, char **argv)
 {
@@ -206,7 +219,7 @@ int spawn(char *prog, char **argv)
         writef("Spawn Mapping Text Segment Error with %08x!\n", i);
         return r;
     }
-	load_prog(blk, child_envid, fd);
+	usr_load_elf(blk, child_envid, fd);
 	/*size = ((struct Filefd *)num2fd(fd))->f_file.f_size;
 	text_start = 0;
 	for (i = 0x1000; i < size; i += BY2PG) {
@@ -224,7 +237,9 @@ int spawn(char *prog, char **argv)
 	tf = &(envs[ENVX(child_envid)].env_tf);
 	tf->pc = UTEXT;
 	tf->regs[29]=esp;
-
+	if (syscall_set_pgfault_handler(child_envid, __asm_pgfault_handler, UXSTACKTOP) < 0){
+		writef("cannot set pgfault handler\n");
+	}
 
 	// Share memory
 	u_int pdeno = 0;

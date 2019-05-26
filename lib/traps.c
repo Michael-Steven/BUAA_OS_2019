@@ -64,6 +64,6 @@ page_fault_handler(struct Trapframe *tf)
         }
     // TODO: Set EPC to a proper value in the trapframe
 	tf->cp0_epc = curenv->env_pgfault_handler;
-
+	//printf("pgfault of curenv : %d\n", curenv->env_pgfault_handler);
     return;
 }
