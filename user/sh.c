@@ -108,6 +108,7 @@ again:
 			fdnum = open(t, O_RDONLY);
 			dup(fdnum, 0);
 			close(fdnum);
+			goto runit;
 			// Your code here -- open t for reading,
 			// dup it onto fd 0, and then close the fd you got.
 			//user_panic("< redirection not implemented");
@@ -120,6 +121,7 @@ again:
 			fdnum = open(t, O_WRONLY);
 			dup(fdnum, 1);
 			close(fdnum);
+			goto runit;
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
 			//user_panic("> redirection not implemented");

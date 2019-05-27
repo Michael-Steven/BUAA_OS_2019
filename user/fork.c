@@ -203,7 +203,7 @@ fork(void)
 		user_panic("page fault handler setup failed.\n");
 	}
 	syscall_set_env_status(newenvid, ENV_RUNNABLE);
-	//writef("OK! newenvid is:%d\n",newenvid);
+	writef("OK! newenvid is:%d\n",newenvid);
 
 	return newenvid;
 }
