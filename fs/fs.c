@@ -74,7 +74,7 @@ map_block(u_int blockno)
 		return 0;
 	}
     // Step 2: Alloc a page of memory for this block via syscall.
-	return syscall_mem_alloc(0, va, PTE_V | PTE_R);
+	return syscall_mem_alloc(0, diskaddr(blockno), PTE_V | PTE_R);
 }
 
 // Overview:
